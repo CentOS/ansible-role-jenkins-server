@@ -1,1 +1,12 @@
 # Defaults variables for role jenkins-server
+
+# Java Tuning for Jenkins, depends on workload/node
+jenkins_java_xms: 1g
+jenkins_java_xmx: 2g
+
+# Do we need TLS encryption for jenkins
+# If we turn boolean on, let's use our hostname to generate .jks java keystore
+# and also protect it with keystore pass
+jenkins_tls: False
+jenkins_tls_hostname: 
+jenkins_tls_keystore_pass:

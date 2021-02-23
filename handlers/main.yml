@@ -1,1 +1,7 @@
 # Defaults handlers for role jenkins-server
+
+- name: restart_jenkins
+  service:
+    name: jenkins
+    state: restarted
+

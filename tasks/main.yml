@@ -1,1 +1,96 @@
 # Defaults tasks for role jenkins-server
+
+- name: Importing specific distro variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+  tags:
+    - vars
+
+- name: Configuring Jenkins yum repository
+  get_url: 
+    url: https://pkg.jenkins.io/redhat-stable/jenkins.repo 
+    dest: /etc/yum.repos.d/jenkins.repo
+
+- name: Ensuring repo file has pointer to jenkins gpg key
+  lineinfile: 
+    dest: /etc/yum.repos.d/jenkins.repo 
+    regexp: '^gpgkey' 
+    line: 'gpgkey=https://pkg.jenkins.io/redhat-stable/jenkins.io.key'
+
+- name: Installing required packages
+  yum: 
+    name: "{{ jenkins_pkgs }}"
+    state: installed
+
+- name: make sure the jenkins directory is created
+  file:
+    dest: "{{ item }}"
+    state: directory
+    owner: jenkins
+    group: jenkins
+  with_items:
+    - /var/lib/jenkins
+    - /etc/pki/jenkins
+  tags:
+    - tls
+    - pki
+
+- name: set file ulimits
+  pam_limits:
+    domain: jenkins
+    limit_type: "{{ item }}"
+    limit_item: nofile
+    value: '65535'
+  with_items:
+   - soft
+   - hard
+
+- name: Configuring Java/Jenkins
+  template:
+    src: etc.sysconfig.jenkins.j2
+    dest: /etc/sysconfig/jenkins
+  notify: restart_jenkins
+
+
+- block:
+    - name: Distributing x509 cert files
+      copy:
+        src: "{{ pkistore }}/{{ item }}"
+        dest: "/etc/pki/jenkins/{{ item }}"
+        owner: jenkins
+        group: jenkins
+      with_items:
+        - "{{ jenkins_tls_hostname }}.key"
+        - "{{ jenkins_tls_hostname }}.crt"
+        - "{{ jenkins_tls_hostname }}-CAChain.crt"
+      register: cert_files
+      
+    - name: converting to pkcs12 format first
+      command:
+        cmd: "openssl pkcs12 -export -passout pass:{{ jenkins_tls_keystore_pass }} -in {{ jenkins_tls_hostname }}.crt -inkey {{ jenkins_tls_hostname }}.key -certfile {{ jenkins_tls_hostname }}-CAChain.crt -name {{ jenkins_tls_hostname }} -out {{ jenkins_tls_hostname }}.p12"
+        chdir: /etc/pki/jenkins     
+      when: cert_files is changed
+      register: pkcs12
+      become_user: jenkins
+
+    - name: Creating java keystore 
+      command:
+        cmd: "keytool -noprompt -importkeystore -srckeystore {{ jenkins_tls_hostname }}.p12 -srcstorepass {{ jenkins_tls_keystore_pass }} -srcstoretype PKCS12 -srcalias {{ jenkins_tls_hostname }} -deststoretype JKS -destkeystore /var/lib/jenkins/{{ jenkins_tls_hostname }}.jks -deststorepass {{ jenkins_tls_keystore_pass }} -destalias {{ jenkins_tls_hostname }}"
+        chdir: /etc/pki/jenkins
+      when: pkcs12 is changed  
+      become_user: jenkins
+      notify: restart_jenkins  
+  
+  when: jenkins_tls
+  tags:
+    - tls
+    - pki
+
+- name: Ensuring Jenkins is started
+  service:
+    name: jenkins
+    state: started
+    enabled: True
+
