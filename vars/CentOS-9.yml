@@ -1,0 +1,4 @@
+jenkins_pkgs:
+  - java-17-openjdk 
+  - git
+  - jenkins
