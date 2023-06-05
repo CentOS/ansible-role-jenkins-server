@@ -94,3 +94,6 @@
     state: started
     enabled: True
 
+- import_role:
+    name: ansible-host
+  when: jenkins_ansible_host  

@@ -10,3 +10,7 @@ jenkins_java_xmx: 2g
 jenkins_tls: False
 jenkins_tls_hostname: 
 jenkins_tls_keystore_pass:
+
+# Do we want to import ansible-host role ? 
+# (handy if we want to kick ansible from jenkins jobs)
+jenkins_ansible_host: False
