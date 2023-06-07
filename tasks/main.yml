@@ -113,3 +113,12 @@
             tls_backend: False
             tls_frontend_redirect: True
   when: jenkins_haproxy_tls  
+
+- name: Ensuring backup user and jobs
+  ansible.builtin.include_role:
+    name: centos-backup
+    tasks_from: client
+  vars:
+    - centos_role: jenkins
+    - role_backup_folders:
+        - /var/lib/jenkins   
