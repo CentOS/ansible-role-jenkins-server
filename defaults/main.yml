@@ -8,9 +8,15 @@ jenkins_java_xmx: 2g
 # If we turn boolean on, let's use our hostname to generate .jks java keystore
 # and also protect it with keystore pass
 jenkins_tls: False
-jenkins_tls_hostname: 
+jenkins_tls_hostname: "{{ inventory_hostname }}" 
 jenkins_tls_keystore_pass:
+
+# Instead of jenkins terminating the TLS connection we can use haproxy
+# If true it will just import haproxy role to expose https => jenkins
+jenkins_haproxy_tls: False
+jenkins_haproxy_tls_hostname: "{{ inventory_hostname }}"
 
 # Do we want to import ansible-host role ? 
 # (handy if we want to kick ansible from jenkins jobs)
 jenkins_ansible_host: False
+

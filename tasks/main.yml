@@ -97,3 +97,19 @@
 - import_role:
     name: ansible-host
   when: jenkins_ansible_host  
+
+- import_role:
+    name: haproxy
+  vars:
+    haproxy_default_backend: jenkins
+    haproxy_type:
+      - revproxy
+    haproxy_vhosts:
+      - name: jenkins
+        public_name: "{{ jenkins_haproxy_tls_hostname }}"
+        backend_nodes:
+          - name: localhost
+            port: 8080
+            tls_backend: False
+            tls_frontend_redirect: True
+  when: jenkins_haproxy_tls  
