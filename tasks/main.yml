@@ -17,7 +17,7 @@
   lineinfile: 
     dest: /etc/yum.repos.d/jenkins.repo 
     regexp: '^gpgkey' 
-    line: 'gpgkey=https://pkg.jenkins.io/redhat-stable/jenkins.io.key'
+    line: 'gpgkey=https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key'
 
 - name: Installing required packages
   yum: 
