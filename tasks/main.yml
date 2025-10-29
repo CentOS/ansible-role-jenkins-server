@@ -47,13 +47,6 @@
    - soft
    - hard
 
-- name: Configuring Java/Jenkins
-  template:
-    src: etc.sysconfig.jenkins.j2
-    dest: /etc/sysconfig/jenkins
-  notify: restart_jenkins
-
-
 - block:
     - name: Distributing x509 cert files
       copy:
