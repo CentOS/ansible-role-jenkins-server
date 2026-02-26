@@ -10,15 +10,11 @@
 
 - name: Configuring Jenkins yum repository
   get_url: 
-    url: https://pkg.jenkins.io/redhat-stable/jenkins.repo 
+    url: https://pkg.jenkins.io/rpm-stable/jenkins.repo
     dest: /etc/yum.repos.d/jenkins.repo
-
-- name: Ensuring repo file has pointer to jenkins gpg key
-  lineinfile: 
-    dest: /etc/yum.repos.d/jenkins.repo 
-    regexp: '^gpgkey' 
-    line: 'gpgkey=https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key'
-
+  tags:
+    - repo
+  
 - name: Installing required packages
   yum: 
     name: "{{ jenkins_pkgs }}"
