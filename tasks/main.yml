@@ -9,9 +9,10 @@
     - vars
 
 - name: Configuring Jenkins yum repository
-  get_url: 
-    url: https://pkg.jenkins.io/rpm-stable/jenkins.repo
-    dest: /etc/yum.repos.d/jenkins.repo
+  shell:
+    cmd: "curl -L -O https://pkg.jenkins.io/rpm-stable/jenkins.repo"
+    chdir: /etc/yum.repos.d/
+    creates: /etc/yum.repos.d/jenkins.repo
   tags:
     - repo
   
