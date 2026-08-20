@@ -1,0 +1,6 @@
+plugins:
+{% for plugin in jenkins_plugins_list %}
+  - artifactId: {{ plugin.name }}
+    source:
+      version: {{ plugin.version }}
+{% endfor %}

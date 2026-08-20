@@ -20,3 +20,16 @@ jenkins_haproxy_tls_hostname: "{{ inventory_hostname }}"
 # (handy if we want to kick ansible from jenkins jobs)
 jenkins_ansible_host: False
 
+# which plugins do we want to automatically install ?
+# We use https://github.com/jenkinsci/plugin-installation-manager-tool so just define the version of that tool first:
+jenkins_plugin_manager_version: 2.15.0
+# Which plugins do you want to install ? format is plugin_name and version (see https://plugins.jenkins.io and we can use :latest)
+jenkins_plugins_list:
+  - name: ssh-agent
+    version: latest
+  - name: ssh-slaves
+    version: latest
+  - name: ssh-credentials
+    version: latest
+  - name: ansicolor
+    version: latest

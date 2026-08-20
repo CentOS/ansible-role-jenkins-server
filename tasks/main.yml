@@ -84,6 +84,31 @@
     state: started
     enabled: True
 
+- block:
+  - name: Ensuring we have jenkins-plugin-manager
+    command:
+      cmd: "curl --silent -L -O https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/{{ jenkins_plugin_manager_version }}/jenkins-plugin-manager-{{ jenkins_plugin_manager_version }}.jar"
+      creates: "/usr/share/java/jenkins-plugin-manager-{{ jenkins_plugin_manager_version }}.jar"
+      chdir: /usr/share/java
+
+  - name: Build plugins yaml file for plugin-manager
+    template:
+      src: plugins-ansible.yml.j2
+      dest: /var/lib/jenkins/plugins-ansible.yml
+    register: plugins_list
+  
+  - name: Kick jenkins-plugin-manager if list changed
+    command:
+      cmd: "java -jar /usr/share/java/jenkins-plugin-manager-{{ jenkins_plugin_manager_version }}.jar
+            --plugin-download-directory /var/lib/jenkins/plugins
+            --plugin-file /var/lib/jenkins/plugins-ansible.yml
+            "
+    when: plugins_list is changed
+    notify: restart_jenkins
+
+  tags:
+    - plugins
+
 - import_role:
     name: ansible-host
   when: jenkins_ansible_host  
