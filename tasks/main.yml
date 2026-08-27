@@ -122,6 +122,7 @@
     haproxy_vhosts:
       - name: jenkins
         public_name: "{{ jenkins_haproxy_tls_hostname }}"
+        public_aliases: "{{ jenkins_haproxy_tls_aliases }}"
         backend_nodes:
           - name: localhost
             port: 8080

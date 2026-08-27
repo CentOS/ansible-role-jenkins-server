@@ -15,6 +15,7 @@ jenkins_tls_keystore_pass:
 # If true it will just import haproxy role to expose https => jenkins
 jenkins_haproxy_tls: False
 jenkins_haproxy_tls_hostname: "{{ inventory_hostname }}"
+jenkins_haproxy_tls_aliases: ""
 
 # Do we want to import ansible-host role ? 
 # (handy if we want to kick ansible from jenkins jobs)
